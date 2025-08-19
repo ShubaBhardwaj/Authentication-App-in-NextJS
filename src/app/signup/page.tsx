@@ -19,13 +19,17 @@ export default function Signup() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const onSignup = async () => {
+    
+  }
+
   return (
-    <div className="min-h-screen bg-black flex flex-col md:flex-row">
+    <div className="h-screen bg-black flex flex-col md:flex-row">
       {/* Image Section - Hidden on mobile, shown on md and up */}
-      <div className="hidden md:flex md:flex-1 bg-neutral-900 items-center justify-center p-8">
-        <div className="w-full h-full max-h-[600px] bg-neutral-800 border border-neutral-700 rounded-2xl overflow-hidden">
+      <div className="hidden md:flex md:flex-1 items-center justify-center ">
+        <div className="w-full h-full bg-neutral-800 border border-neutral-700 rounded-2xlf overflow-hidden">
           <img
-            src="/images/signup_page.jpg"
+            src="images/signup_page.png"
             alt="Handmade crafts"
             className="w-full h-full object-cover"
           />
@@ -131,6 +135,7 @@ export default function Signup() {
             <button
               type="submit"
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors duration-200 text-base mt-8"
+              onClick={onSignup}
             >
               Create Account
             </button>
@@ -144,7 +149,7 @@ export default function Signup() {
                 href="/login"
                 className="text-orange-500 hover:text-orange-400 font-medium transition-colors duration-200"
               >
-                Sign in here
+                Login in here
               </Link>
             </p>
           </div>
@@ -153,12 +158,3 @@ export default function Signup() {
     </div>
   )
 }
-
-
-
-
-
-
-
-
-
