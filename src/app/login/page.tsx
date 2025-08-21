@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import axios from "axios";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { log } from "console";
+import { toast } from "react-hot-toast";
+import { set } from "mongoose";
 
 
 export default function Login() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -15,13 +19,26 @@ export default function Login() {
   })
   const [focusedField, setFocusedField] = useState<keyof typeof formData | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleInputChange = (field: keyof typeof formData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const onLogin = async () => {
-    
+  const onLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault(); // stop form from reloading
+      setLoading(true);
+      const response = await axios.post("/api/users/login", formData);
+      console.log("Login successful", response.data);
+      toast.success("Login successful");
+      router.push("/profile");
+    } catch (error: any) {
+      console.log("Error while login", error.message);
+      toast.error("Error while login",error.message);
+    }finally{
+      setLoading(false);
+    }
   }
 
   return (
@@ -47,7 +64,7 @@ export default function Login() {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={onLogin}>
             {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-white">
@@ -137,9 +154,9 @@ export default function Login() {
             <button
               type="submit"
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors duration-200 text-base mt-8"
-              onClick={onLogin}
+              // onClick={onLogin}
             >
-              Sign In
+              {loading?"Loading...":"Login"}
             </button>
           </form>
 
