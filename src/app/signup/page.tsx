@@ -5,22 +5,46 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import axios from "axios";
 import { Mail, Lock, User } from "lucide-react"
+import { toast } from "react-hot-toast";
 
 
 export default function Signup() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
+    username: "",
   })
   const [focusedField, setFocusedField] = useState<keyof typeof formData | null>(null)
+  const [loading, setLoading] = useState(false)
+
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const onSignup = async () => {
-    
+  const onSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault(); // stop form from reloading
+      setLoading(true);
+      const response = await axios.post("/api/users/signup", formData);
+      console.log("Signup response:", response.data);
+
+      if (response.status === 201 || response.status === 200) {
+        toast.success("Signup successful!");
+        router.push("/login");
+      } else {
+        toast.error("Signup failed. Please try again.");
+      }
+
+
+
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -46,7 +70,7 @@ export default function Signup() {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={onSignup}>
             {/* Name Field */}
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-white">
@@ -56,20 +80,20 @@ export default function Signup() {
                 <User
                   className={
                     "absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors duration-200 " +
-                    (focusedField === "name" ? "text-orange-500" : "text-neutral-500")
+                    (focusedField === "username" ? "text-orange-500" : "text-neutral-500")
                   }
                 />
                 <input
                   id="name"
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  onFocus={() => setFocusedField("name")}
+                  value={formData.username}
+                  onChange={(e) => handleInputChange("username", e.target.value)}
+                  onFocus={() => setFocusedField("username")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="Enter your full name"
                   className={
                     "w-full pl-11 pr-4 py-3.5 bg-neutral-800 rounded-xl text-white text-base placeholder-neutral-500 outline-none transition-colors duration-200 border-2 " +
-                    (focusedField === "name" ? "border-orange-500" : "border-neutral-600 hover:border-neutral-500")
+                    (focusedField === "username" ? "border-orange-500" : "border-neutral-600 hover:border-neutral-500")
                   }
                 />
               </div>
@@ -133,11 +157,12 @@ export default function Signup() {
 
             {/* Submit Button */}
             <button
+              disabled={loading}
               type="submit"
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors duration-200 text-base mt-8"
-              onClick={onSignup}
+              // onClick={onSignup}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
