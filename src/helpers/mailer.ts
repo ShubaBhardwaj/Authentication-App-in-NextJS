@@ -2,14 +2,10 @@ import nodemailer from 'nodemailer';
 import User from '@/models/user.model';
 import bcrypt from 'bcryptjs';
 
-// Looking to send emails in production? Check out our Email API/SMTP product!
-var transport = nodemailer.createTransport({
-  
-});
 
 export const sendEmail = async({email, emailType, userId}: {email: string, emailType: string, userId: any})=>{
   try {
-    const hashToken = bcrypt.hash(userId.toString(), 10)
+    const hashToken = await bcrypt.hash(userId.toString(), 10)
 
     if(emailType === 'VERIFY'){
         await User.findByIdAndUpdate(userId,{verifyToken: hashToken, verifyTokenExpiry: Date.now() + 3600000})
@@ -30,12 +26,13 @@ export const sendEmail = async({email, emailType, userId}: {email: string, email
       from: process.env.EMAIL_HOST,
       to: email,  
       subject: emailType === "VERIFY" ? "Verify your email" : "Rest you password",
-      html: `<p>Click <a href="${process.env.domain}/verifyemail?token=${hashToken}">here</a> to ${emailType === "VERIFY" ? "verify your email" : "reset your password"}.</p>`
+      html: `<p>Click <a href="${process.env.domain}/verifyemail?token=${hashToken}">here</a> to ${emailType === "VERIFY" ? "verify your email" : "reset your password"} or copy past the link below <br> ${process.env.domain}/verifiyemail?token=${hashToken} </p>`
     }
 
+    await transport.verify();
+    console.log("✅ Server is ready to take messages");
 
     const mailResponse = await transport.sendMail(mailOption);
-
     return mailResponse
 
 

@@ -2,6 +2,7 @@ import {connectDB} from "@/db/dbconfig";
 import User from "@/models/user.model";
 import { NextRequest,NextResponse  } from "next/server";
 import bcrypt from "bcryptjs";
+import { sendEmail } from "@/helpers/mailer";
 
 connectDB();
 
@@ -23,19 +24,34 @@ export async function POST(request: NextRequest) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newuser = new User({
-            username,
-            email,
-            password: hashedPassword
-        })
-
+       const newuser = new User({
+                username,
+                email,
+                password: hashedPassword
+            })
         const savedUser =  await newuser.save();
 
-        return NextResponse.json({
-            message: "User created successfully",
-            status: 201,
-            savedUser
-        });
+
+        //send email
+        try {
+            await sendEmail({
+                email,
+                emailType: "VERIFY",
+                userId: savedUser._id,
+            });
+        } catch (error:any) {
+            console.log("Email sending error:", error);
+            return NextResponse.json(
+                { message: "User created but failed to send verification email", savedUser },
+                { status: 201 }
+            );
+            
+        }
+
+        return NextResponse.json(
+            {message: "User created successfully",savedUser},
+            {status: 201}   
+        );
 
     } catch (error:any) {
         return NextResponse.json({ message: error.message }, { status: 500 });
