@@ -2,8 +2,9 @@ import { connectDB } from "@/db/dbconfig";
 import User from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
+connectDB();
 
-export async function GET(request:NextRequest) {
+export async function POST(request:NextRequest) {
     try {
         const reqBody = await request.json()
         const {token} = reqBody

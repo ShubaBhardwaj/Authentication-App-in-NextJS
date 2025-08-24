@@ -26,7 +26,7 @@ export const sendEmail = async({email, emailType, userId}: {email: string, email
       from: process.env.EMAIL_HOST,
       to: email,  
       subject: emailType === "VERIFY" ? "Verify your email" : "Rest you password",
-      html: `<p>Click <a href="${process.env.domain}/verifyemail?token=${hashToken}">here</a> to ${emailType === "VERIFY" ? "verify your email" : "reset your password"} or copy past the link below <br> ${process.env.domain}/verifiyemail?token=${hashToken} </p>`
+      html: `<p>Click <a href="${process.env.domain}/verifyemail?token=${hashToken}">here</a> to ${emailType === "VERIFY" ? "verify your email" : "reset your password"} or copy past the link below <br> ${process.env.domain}/verifyemail?token=${hashToken} </p>`
     }
 
     await transport.verify();
